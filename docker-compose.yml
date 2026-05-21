@@ -1,0 +1,50 @@
+#Docker composeは複数のDockerコンテナとそれらを利用するネットワーク、ボリュームをまとめて管理する場所
+
+services:
+  front:
+    container_name: reminder_frontend
+    build:
+      context: ./reminder_frontend
+      dockerfile: Dockerfile
+    ports:
+      5173:5173
+    #この右辺の/appはbackendで指定した/appとは別物
+    volumes:
+      - .frontend:/app
+    command: npm run dev
+    depends_on:
+      - backend
+    
+
+  backend:
+    container_name: reminder_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      8000:8000
+    #慣習的に、.:/appの書き方がデフォルト　左辺にdockercomposeのパス:右辺にLinax環境のフォルダという形式で紐付け（マウント）してあげる
+    #ここで右辺に/appを記載すると、Linux上にフォルダが無くてもDockerが自動でフォルダを生成してくれるようになっている
+    volumes:
+      - .backend:/app
+    depends_on:
+      - postgres
+    env_file: .env
+    
+  postgres:
+    image: postgres:16-alpine
+    container_name: reminder_db
+    ports:
+      5432:5432
+    #左辺がDocker内部の保存領域名:右辺がPostgreSQLがDBデータの保存する場所（DBMSが既に決めている場所がある）
+    #ここではコンテナの中の重要なデータだけを別の場所に保存する設定をしてる
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "pass"
+      POSTGRES_DB: "reminder_db"
+    
+#Dockerに対し、postgres_dataという永続volumeを使う宣言をしている
+volumes:
+  postgres_data:
