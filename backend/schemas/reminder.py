@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
 
 class Reminders(BaseModel):
@@ -7,10 +7,10 @@ class Reminders(BaseModel):
 
     id: int
     name: str 
-    title:
-    comment:
-    remind_at:
-    notify_email:
-    is_notified:
-    created_at:
-    updated_at:
+    title: str
+    comment: str | None = None
+    remind_at: datetime = Field(alias="remindAt")
+    notify_email: EmailStr
+    is_notified: str
+    created_at: datetime = Field(alias="createdAt")
+    updated_at: datetime = Field(alias="updatedAt")
