@@ -2,6 +2,7 @@ Flask
 psycopg[binary] == 3.2.3
 pydantic == 2.10.2
 pydantic-settings == 2.6.1
+#emailの型を検証するためのパッケージ
 email-validator==2.2.0
 python-dotenv == 1.0.1
 flask_cors == 5.0.1
