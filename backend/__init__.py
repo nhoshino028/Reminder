@@ -4,4 +4,33 @@ from flask_cors import CORS
 
 #ここにはアプリ起動に必要な関数モデルやブループリントを登録
 from app.config import Settings
+from app.db import init_app as init_db
+from app.errors import register_error_handlers
+from app.routes.reminder import reminders_bp
 
+def create_app() -> Flask:
+    app = Flask(__name__)
+
+    settings = Settings()
+    app.config["SETTINGS"] = settings #接続情報を保存
+    app.json.sort_keys = False
+    app.json.ensure_ascii = False
+    app.debug = settings.flask_debug
+
+    init_db(app)
+
+    #クロスオリジンリソース共有→異なるオリジン（ここでいう"http://localhost:5173","http://localhost:8080"）との通信を許可する
+    #許可したドメインのみのアクセスにすることでセキュリティ性を損なわない
+    CORS(
+        app,
+        resources={
+            r"/*": {
+                "origins": [
+                    "http://localhost:5173",
+                    "http://localhost:8080",
+                ]
+            }
+        },
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_header=["Content-Type"],
+    )
