@@ -1,4 +1,5 @@
-import psycopg from psycopg import dict_row
+import psycopg 
+from psycopg.rows import dict_row
 from flask import Flask, g, current_app  #gオブジェクトは１回のリクエスト間で有効な情報を保持してくれるグローバルオブジェクト
 
 #現在のFlaskリクエストに基づくpsycopgの接続を返す

@@ -3,9 +3,9 @@ from flask import Flask
 from flask_cors import CORS
 
 #ここにはアプリ起動に必要な関数モデルやブループリントを登録
-from app.config import Settings
-from app.db import init_app as init_db
-from app.errors import register_error_handlers
+from .config import Settings
+from .db import init_app as init_db
+from .errors import register_error_handlers
 #from app.routes.reminder import reminders_bp
 
 def create_app() -> Flask:

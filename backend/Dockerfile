@@ -8,7 +8,7 @@ FROM python:3.12-slim
 #    build-essential \
 #    && rm -rf /var/lib/apt/lists/*
 
-#WORKDIR /app
+WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -17,5 +17,5 @@ COPY . .
 
 EXPOSE 8000
 
-ENV FLASK_APP=app.py
+
 CMD ["flask", "--app", "app:create_app", "run", "--host=0.0.0.0", "--port=8000"]

@@ -5,7 +5,7 @@
 	"dockerComposeFile": "../../docker-compose.yml",
 	"service": "backend",
 	"workspaceFolder": "/app",
-	"runservices": [
+	"runServices": [
 		"postgres"
 	],
 	"customizations": {
