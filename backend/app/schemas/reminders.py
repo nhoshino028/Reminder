@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
-
+#型チェック
 class Reminders(BaseModel):
     model_config = ConfigDict(populate_by_name=True, from_attributes=True)
 
@@ -34,11 +34,17 @@ class RemindCreateRequest(BaseModel):
     updated_at: datetime = Field(alias="updatedAt")
 
     #リマインド時間が現在時刻よりも前の場合にエラーを返す
-    
+    @model_validator(mode="after")
+    def _time_check(self) -> "RemindCreateRequest": #RemindCreateRequestのインスタンス生成
+        if self.remind_at < datetime.now(UTC)
+            raise ValueError("remindAt must be after now")
+        return self
+
+
 #編集
-#ここではなんか入れられる処理ある？
+#入力チェックが必要
+    
 
-
-#削除
-#一括削除想定
-
+#レスポンスモデル（登録、更新時に必要　DBからのレスポンスを）
+class RemindRespose(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True) #
