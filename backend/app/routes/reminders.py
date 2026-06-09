@@ -1,9 +1,9 @@
-from flask import blueprint
+from flask import Blueprint, jsonify, request
 from psycopg import errors as pg_errors
 
 from app.db import get_db
-from app.errors import ConflictError, NotfoundError
-from app.schemas.Reminders import Reminders
+from app.errors import NotFoundError
+from app.schemas.reminders import Reminders, RemindCreateRequest, RemindRespose
 
 reminders_bp = Blueprint("Schedules", __name__)
 
@@ -16,7 +16,35 @@ reminders_bp = Blueprint("Schedules", __name__)
 @reminders_bp.post("/reminders")
 def create_remind():
     payload = request.get_json(silent=True) or {}
-    body = 
+    body = RemindCreateRequest.model_validate(payload)
+
+    db = get_db()
+
+    try:
+        with db.cursor() as cur:
+            cur.execute(
+                """
+                    INSERT INTO reminders
+                        (title, comment, remind_at, notify_email, is_notified, created_at, updated_at)
+                    VALUES
+                        (%(title)s,%(comment)s,%(remind_at)s,%(notify_email)s,%(is_notified)s,now(), now())
+                    RETURNING id, title, comment, remind_at, notify_email, is_notified, created_at, updated_at 
+                """,
+                body.model_dump(),
+            )
+            row = cur.fetchone()
+        db.commit()
+
+    except NotFoundError:
+        db.rollback()
+        raise
+
+    response_body = RemindRespose.model_validate(row).model_dump(
+        mode="json", by_alias=True
+    )
+
+    return jsonify(response_body), 200
+
 
 #編集
 

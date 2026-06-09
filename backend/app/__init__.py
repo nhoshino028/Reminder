@@ -6,7 +6,8 @@ from flask_cors import CORS
 from .config import Settings
 from .db import init_app as init_db
 from .errors import register_error_handlers
-#from app.routes.reminder import reminders_bp
+from app.routes.health import health_bp
+from app.routes.reminders import reminders_bp
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -34,5 +35,8 @@ def create_app() -> Flask:
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_header=["Content-Type"],
     )
+
+    app.register_blueprint(health_bp)
+    app.register_blueprint(reminders_bp)
 
     return app
