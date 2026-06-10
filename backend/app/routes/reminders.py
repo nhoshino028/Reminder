@@ -25,9 +25,9 @@ def create_remind():
             cur.execute(
                 """
                     INSERT INTO reminders
-                        (title, comment, remind_at, notify_email, is_notified, created_at, updated_at)
+                        (title, comment, remind_at, notify_email, created_at, updated_at)
                     VALUES
-                        (%(title)s,%(comment)s,%(remind_at)s,%(notify_email)s,%(is_notified)s,now(), now())
+                        (%(title)s,%(comment)s,%(remind_at)s,%(notify_email)s,now(), now())
                     RETURNING id, title, comment, remind_at, notify_email, is_notified, created_at, updated_at 
                 """,
                 body.model_dump(),

@@ -25,7 +25,6 @@ class RemindCreateRequest(BaseModel):
     comment: str | None = None
     remind_at: datetime = Field(alias="remindAt")
     notify_email: EmailStr
-    is_notified: bool
 
     #リマインド時間が現在時刻よりも前の場合にエラーを返す
     @field_validator("remind_at")
@@ -51,6 +50,6 @@ class RemindRespose(BaseModel):
     comment: str | None = None
     remind_at: datetime = Field(alias="remindAt")
     notify_email: EmailStr
-    is_notified: str
+    is_notified: bool
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
