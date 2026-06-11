@@ -42,7 +42,7 @@ class RemindCreateRequest(BaseModel):
     
 
 #レスポンスモデル（登録、更新時に必要　DBからのレスポンスを変換）
-class RemindRespose(BaseModel):
+class RemindResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True, from_attributes=True) #
 
     id: int
