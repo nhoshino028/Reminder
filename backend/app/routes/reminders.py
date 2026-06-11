@@ -3,7 +3,7 @@ from psycopg import errors as pg_errors
 
 from app.db import get_db
 from app.errors import NotFoundError
-from app.schemas.reminders import Reminders, RemindCreateRequest, RemindRespose
+from app.schemas.reminders import Reminders, RemindCreateRequest, RemindResponse
 
 reminders_bp = Blueprint("Schedules", __name__)
 
@@ -35,11 +35,11 @@ def create_remind():
             row = cur.fetchone()
         db.commit()
 
-    except NotFoundError:
+    #NotFoundErrorは登録処理だとおかしい。。。ので変更
+    except ValueError:
         db.rollback()
-        raise
 
-    response_body = RemindRespose.model_validate(row).model_dump(
+    response_body = RemindResponse.model_validate(row).model_dump(
         mode="json", by_alias=True
     )
 
