@@ -8,7 +8,7 @@ class Reminders(BaseModel):
     id: int
     title: str
     comment: str | None = None
-    remind_at: datetime = Field(alias="remindAt")
+    remind_at: datetime
     #EmailStr
     #メールアドレスとして不正な形式は弾いてくれるが、ドメイン制限やビジネスルールの追加を行いたい場合はカスタムバリデーションを利用する必要がありそう
     notify_email: EmailStr
@@ -21,9 +21,9 @@ class Reminders(BaseModel):
 class RemindCreateRequest(BaseModel):
     model_config = ConfigDict(popular_by_name=True)
 
-    title: str
-    comment: str | None = None
-    remind_at: datetime = Field(alias="remindAt")
+    title: str = Field(min_length=1, max_length=100)
+    comment: str = Field(max_length=1000)
+    remind_at: datetime
     notify_email: EmailStr
 
     #リマインド時間が現在時刻よりも前の場合にエラーを返す
@@ -48,7 +48,7 @@ class RemindResponse(BaseModel):
     id: int
     title: str
     comment: str | None = None
-    remind_at: datetime = Field(alias="remindAt")
+    remind_at: datetime
     notify_email: EmailStr
     is_notified: bool
     created_at: datetime = Field(alias="createdAt")
