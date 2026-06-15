@@ -11,6 +11,9 @@ from app.routes.reminders import reminders_bp
 
 def create_app() -> Flask:
     app = Flask(__name__)
+    
+    #register_error_handlers(app)を登録
+    register_error_handlers(app)
 
     settings = Settings()
     app.config["SETTINGS"] = settings #接続情報を保存
