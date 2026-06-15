@@ -31,7 +31,7 @@ class RemindCreateRequest(BaseModel):
     @classmethod
     def _validate_remind_check(cls, value) -> "RemindCreateRequest": #RemindCreateRequestのインスタンス生成
         if value < datetime.now(timezone.utc): #現在日時と入力された日時を比較
-            raise ValueError("remindAt must be after now")
+            raise ValueError("remind_at must be after now")
         return value
     
 
@@ -48,7 +48,7 @@ class RemindResponse(BaseModel):
     id: int
     title: str
     comment: str | None = None
-    remind_at: datetime
+    remind_at: datetime 
     notify_email: EmailStr
     is_notified: bool
     created_at: datetime = Field(alias="createdAt")
