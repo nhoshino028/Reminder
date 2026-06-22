@@ -3,12 +3,7 @@ from psycopg import errors as pg_errors
 
 from app.db import get_db
 from app.errors import NotFoundError
-from app.schemas.reminders import (
-    Reminders,
-    RemindCreateRequest,
-    RemindUpdateRequest,
-    RemindResponse,
-)
+from app.schemas.reminders import Reminders, RemindCreateRequest, RemindResponse
 
 reminders_bp = Blueprint("Schedules", __name__)
 
@@ -70,13 +65,18 @@ def delete_remind(id):
             )
             row = cur.fetchone()
 
+            if id < 1:
+                raise ValueError("invalid: id must be greater than 0")
+
             if row is None:
                 raise NotFoundError("not found: remind not found")
+            
         db.commit()
 
     except NotFoundError:
         db.rollback()
         raise
+
 
     return ("", 204)
 
