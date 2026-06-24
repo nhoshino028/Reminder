@@ -8,7 +8,7 @@ from pydantic import ValidationError
 class APIError(Exception):
     code: str = "API_ERROR"  # 文字列
     message: str = "api error"  # メッセージ
-    status_code = int = 500  # HTTPステータスコード
+    status_code: int = 500  # HTTPステータスコード
 
     # カスタムメッセージ付きで例外を初期化する
     # APIerrorの中で意図してraiseする
@@ -21,8 +21,8 @@ class APIError(Exception):
 # リソースが見つからない場合の例外
 class NotFoundError(APIError):
     code = "NOT_FOUND"
-    status_code: 404
-    message = "resauce not found"
+    status_code = 404
+    message = "resource not found"
 
 
 # 一意制約や外部キー制約違反の例外
