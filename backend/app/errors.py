@@ -32,6 +32,13 @@ class ConflictError(APIError):
     message = "conflict"
 
 
+# id検証用のカスタム例外
+class BadRequestError(APIError):
+    code = "VALIDATION_ERROR"
+    status_code = 400
+    message = "request validation failed"
+
+
 # 捕捉したエラーをjson形式にしてHTTPレスポンスとして返す処理
 def register_error_handlers(app: Flask) -> None:
 
