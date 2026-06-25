@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from psycopg import errors as pg_errors
 
 from app.db import get_db
-from app.errors import NotFoundError
+from app.errors import NotFoundError, BadRequestError
 from app.schemas.reminders import Reminders, RemindCreateRequest, RemindResponse
 
 reminders_bp = Blueprint("Schedules", __name__)
@@ -29,7 +29,7 @@ def create_remind():
                         (title, comment, remind_at, notify_email, created_at, updated_at)
                     VALUES
                         (%(title)s,%(comment)s,%(remind_at)s,%(notify_email)s,now(), now())
-                    RETURNING id, title, comment, remind_at, notify_email, is_notified, created_at, updated_at 
+                    RETURNING id, title, comment, remind_at, notify_email, is_notified, created_at, updated_at
                 """,
                 body.model_dump(),
             )
@@ -48,35 +48,40 @@ def create_remind():
 
 
 # 削除
-@reminders_bp.delete("/reminders/<int:id>")
-def delete_remind(id):
+@reminders_bp.delete("/reminders/<id>")
+def delete_remind(id: str):
+    # idの検証を行う
+    try:
+        remind_id = int(id)
+    except ValueError:
+        raise BadRequestError("invalid: id must be an integer")
+
+    if remind_id < 1:
+        raise BadRequestError("invalid: id must be greater than 0")
+
     db = get_db()
     try:
         with db.cursor() as cur:
             cur.execute(
                 """
-                    DELETE FROM reminders 
-                    WHERE id = %(id)s 
+                    DELETE FROM reminders
+                    WHERE id = %(id)s
                     RETURNING id
                 """,
                 {
-                    "id": id,
+                    "id": remind_id,
                 },
             )
             row = cur.fetchone()
 
-            if id < 1:
-                raise ValueError("invalid: id must be greater than 0")
-
             if row is None:
                 raise NotFoundError("not found: remind not found")
-            
+
         db.commit()
 
     except NotFoundError:
         db.rollback()
         raise
-
 
     return ("", 204)
 
