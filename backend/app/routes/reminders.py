@@ -3,14 +3,20 @@ from psycopg import errors as pg_errors
 
 from app.db import get_db
 from app.errors import NotFoundError, BadRequestError
-from app.schemas.reminders import Reminders, RemindCreateRequest, RemindResponse
+from app.schemas.reminders import (
+    Reminders,
+    RemindCreateRequest,
+    RemindPutRequest,
+    RemindResponse,
+)
 
 reminders_bp = Blueprint("Schedules", __name__)
 
-# 一覧表示
-#  @reminders_bp.get("/reminders")
-#  def list_reminder():
-#      query = Reminders.model_validate(request.args.to_dict())
+一覧表示
+@reminders_bp.get("/reminders")
+def list_reminder():
+      query = RemindPutRequest.model_validate(request.args.to_dict())
+
 
 
 # リマインダー登録
@@ -45,6 +51,14 @@ def create_remind():
     )
 
     return jsonify(response_body), 200
+
+
+# 更新
+@reminders_bp.put("/reminders/<id>")
+def put_remind(id):
+
+    payload = request.get_json(silent=True)
+    body = RemindPutRequest.model_validate(payload)
 
 
 # 削除
