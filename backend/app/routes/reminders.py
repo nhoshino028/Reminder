@@ -4,7 +4,6 @@ from psycopg import errors as pg_errors
 from app.db import get_db
 from app.errors import NotFoundError, BadRequestError
 from app.schemas.reminders import (
-    Reminders,
     RemindCreateRequest,
     RemindPutRequest,
     RemindResponse,
@@ -12,10 +11,33 @@ from app.schemas.reminders import (
 
 reminders_bp = Blueprint("Schedules", __name__)
 
+
 # 一覧表示
-# @reminders_bp.get("/reminders")
-# def list_reminder():
-#      query = RemindPutRequest.model_validate(request.args.to_dict())
+@reminders_bp.get("/reminders")
+def list_reminder():
+    db = get_db()
+    with db.cursor() as cur:
+        cur.execute("""
+                SELECT
+                    id,
+                    title,
+                    comment,
+                    remind_at,
+                    notify_email,
+                    is_notified,
+                    created_at,
+                    updated_at
+                FROM
+                    reminders
+        """)
+        rows = cur.fetchall()
+
+    response_body = [
+        RemindResponse.model_validate(row).model_dump(mode="json", by_alias=True)
+        for row in rows
+    ]
+
+    return jsonify(response_body), 200
 
 
 # リマインダー登録
