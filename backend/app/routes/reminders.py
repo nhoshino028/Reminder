@@ -12,11 +12,10 @@ from app.schemas.reminders import (
 
 reminders_bp = Blueprint("Schedules", __name__)
 
-一覧表示
-@reminders_bp.get("/reminders")
-def list_reminder():
-      query = RemindPutRequest.model_validate(request.args.to_dict())
-
+# 一覧表示
+# @reminders_bp.get("/reminders")
+# def list_reminder():
+#      query = RemindPutRequest.model_validate(request.args.to_dict())
 
 
 # リマインダー登録
@@ -59,6 +58,42 @@ def put_remind(id):
 
     payload = request.get_json(silent=True)
     body = RemindPutRequest.model_validate(payload)
+    db = get_db()
+
+    try:
+        with db.cursor() as cur:
+            cur.execute(
+                """
+                    UPDATE reminders
+                    SET
+                        title = %(title)s,
+                        comment = %(comment)s,
+                        remind_at = %(remind_at)s,
+                        notify_email = %(notify_email)s,
+                        updated_at = now()
+                    WHERE id = %(id)s
+                    RETURNING *
+                """,
+                {
+                    **body.model_dump(),
+                    "id": id,
+                },
+            )
+            row = cur.fetchone()
+
+            if row is None:
+                raise NotFoundError("not found: Remind not found")
+        db.commit()
+
+    except NotFoundError:
+        db.rollback()
+        raise
+
+    response_body = RemindResponse.model_validate(row).model_dump(
+        mode="json", by_alias=True
+    )
+
+    return jsonify(response_body), 200
 
 
 # 削除
