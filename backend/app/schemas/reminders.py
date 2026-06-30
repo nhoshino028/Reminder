@@ -20,7 +20,7 @@ class Reminders(BaseModel):
 
 # 登録
 class RemindCreateRequest(BaseModel):
-    model_config = ConfigDict(popular_by_name=True)
+    model_config = ConfigDict(populate_by_name=True)
 
     title: str = Field(min_length=1, max_length=100)
     comment: str = Field(max_length=1000)
@@ -36,50 +36,50 @@ class RemindCreateRequest(BaseModel):
         if value < datetime.now(timezone.utc):  # 現在日時と入力された日時を比較
             raise ValueError("remind_at must be after now")
         return value
-    
+
 
 # 更新
 class RemindPutRequest(BaseModel):
-    model_config = ConfigDict(popular_by_name=True)
+   model_config = ConfigDict(popular_by_name=True)
+   title: str = Field(max_length=100)
+   comment: str | None = Field(max_length=1000)
+   remind_at: datetime
+   notify_email: EmailStr = Field(max_length=254)
+   # 型チェックでできるもの
+        #必須項目であること（全項目）
+        #文字列であること（title, notify_email）
+        #100文字以内（title）
+        #1000文字以内（comment）
+        #ISO8601形式の文字列（remind_at）
+        #パース可能な日時であること（remind_at）
+        #RFC 5322 準拠のメールアドレス形式
+        #254文字以内（notify_email）
+        
+   # 値チェックが必要なもの
+   # 空文字でないこと（trim後1文字以上）(title)
+   @field_validator("title", mode="before")
+   @classmethod
+   def empty_check(cls, value):
+       if value.strip() == "":
+           raise ValueError("title must not be empty")
+       return value
+   #タイムゾーンが含まれていること（remind_at）
+#@field_validator("remind_at")
+#@classmethod
+#def timezone_check(cls, value):
+#   if value.
 
-    title: str = Field(max_length=100)
-    comment: str | None = Field(max_length=1000)
-    remind_at: datetime
-    notify_email: EmailStr = Field(max_length=254)
-    
-    # 型チェックでできるもの
-        # 必須項目であること（全項目）
-        # 文字列であること（title, notify_email）
-        # 100文字以内（title）
-        # 1000文字以内（comment）
-        # ISO8601形式の文字列（remind_at）
-        # パース可能な日時であること（remind_at）
-        # RFC 5322 準拠のメールアドレス形式
-        # 254文字以内（notify_email）
+   
+   #現在時刻より未来であること（remind_at）
+   @field_validator("remind_at")
+   @classmethod
+   def _validate_remind_check(
+       cls, value
+   ) -> "RemindCreateRequest":  # RemindCreateRequestのインスタンス生成
+       if value < datetime.now(timezone.utc):  # 現在日時と入力された日時を比較
+           raise ValueError("remind_at must be after now")
+       return value
 
-    # 値チェックが必要なもの
-    # 空文字でないこと（trim後1文字以上）(title)　
-    @field_validator("title", mode="before")
-    @classmethod
-    def empty_check(cls, value):
-        if value.strip() == "":
-            raise ValueError("title must not be empty")
-        return value
-    
-    # タイムゾーンが含まれていること（remind_at）
-    @field_validator("remind_at")
-    @classmethod
-    def timezone_check()
-
-    # 現在時刻より未来であること（remind_at）
-    @field_validator("remind_at")
-    @classmethod
-    def _validate_remind_check(
-        cls, value
-    ) -> "RemindCreateRequest":  # RemindCreateRequestのインスタンス生成
-        if value < datetime.now(timezone.utc):  # 現在日時と入力された日時を比較
-            raise ValueError("remind_at must be after now")
-        return value
 
 # レスポンスモデル（登録、更新時に必要　DBからのレスポンスを変換）
 class RemindResponse(BaseModel):
